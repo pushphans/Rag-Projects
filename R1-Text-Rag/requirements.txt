@@ -1,0 +1,11 @@
+langchain
+langchain-community
+langchain-text-splitters
+langchain-deepseek
+langchain-huggingface
+sentence-transformers
+pydantic-settings
+fastapi
+uvicorn
+pathlib
+langchain-chroma
