@@ -10,9 +10,6 @@ build/
 .venv
 .venv/
 
-# Vector DB artifacts (regenerate on demand)
-chroma_db/
-
 # IDE
 .vscode/
 .idea/
