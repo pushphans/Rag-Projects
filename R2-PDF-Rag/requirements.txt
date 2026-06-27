@@ -11,3 +11,4 @@ pathlib
 langchain-qdrant
 qdrant-client
 pypdf
+python-multipart

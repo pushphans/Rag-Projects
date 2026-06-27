@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, File, UploadFile
 from qdrant_client.models import Distance, VectorParams
-from app.vector_db.qdrant_vector_db import QClient, QVectorDb, collection_name
-from app.rag.ingestion_pipeline.ingestion import get_pdf_chunks
+from app.vector_db.qdrant_vector_db import QVectorDb
+from app.rag.ingestion_pipeline.ingestion import get_pdf_chunks_from_bytes
 
 rag_router = APIRouter(
     prefix="/rag",
@@ -9,39 +9,22 @@ rag_router = APIRouter(
 )
 
 
-@rag_router.post("/ingest")
-async def ingest_pdf():
+@rag_router.post("/upload")
+async def ingest_pdf(file: UploadFile = File(...)):
+
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
 
     try:
-        collection_exists = QClient.collection_exists(collection_name=collection_name)
+        pdf_file = await file.read()
 
-        if not collection_exists:
-            QClient.create_collection(
-                collection_name=collection_name,
-                vectors_config=VectorParams(
-                    size=384,
-                    distance=Distance.COSINE,
-                ),
-            )
-        else:
-            data = QClient.get_collection(collection_name=collection_name)
-            if data.points_count > 0:
-                return {
-                    "status": "skipped",
-                    "detail": "Document already exists",
-                }
-
-        chunks = await get_pdf_chunks()
+        chunks = await get_pdf_chunks_from_bytes(pdf_file=pdf_file)
 
         await QVectorDb.aadd_documents(documents=chunks)
-
         return {
             "status": "success",
-            "detail": "PDF ingested successfully",
+            "detail": "PDF file is uploaded and ingested succssfully",
         }
-
-    except FileNotFoundError as fnf:
-        raise HTTPException(status_code=404, detail=str(fnf))
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

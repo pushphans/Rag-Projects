@@ -1,27 +1,33 @@
 from langchain_core.documents import Document
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pathlib import Path
+import io
+from pypdf import PdfReader
 
-file_path = Path("app/sample_data/sample.pdf").resolve()
 
+async def get_pdf_chunks_from_bytes(pdf_file: bytes) -> list[Document]:
 
-async def get_pdf_chunks() -> list[Document]:
+    memory_file = io.BytesIO(pdf_file)
 
-    if not file_path.exists():
-        raise FileNotFoundError("File not found")
+    reader = PdfReader(memory_file)
 
-    # LOADER OBJECT
-    loader = PyPDFLoader(
-        file_path=str(file_path),
-    )
+    docs = []
 
-    docs = await loader.aload()
+    for page_number, page in enumerate(reader.pages):
+        text = page.extract_text()
+        if text:
+            document = Document(
+                page_content=text,
+                metadata={"page_number": page_number + 1},
+            )
+            docs.append(document)
 
     # SPLITTER OBJECT
+    # chunk_size=800 chars (~200 tokens) -> stays within MiniLM's ~256 token limit
+    # chunk_overlap=120 (~15% of chunk_size) -> keeps ideas safe across chunk borders
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=100,
-        chunk_overlap=10,
+        chunk_size=800,
+        chunk_overlap=120,
     )
 
     chunks_docs = splitter.split_documents(documents=docs)
