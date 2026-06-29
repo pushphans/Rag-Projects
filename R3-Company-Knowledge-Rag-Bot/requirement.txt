@@ -1,0 +1,7 @@
+langchain
+langgraph
+langchain-huggingface
+langchain-deepseek
+fastapi
+uvicorn
+pydantic-settings

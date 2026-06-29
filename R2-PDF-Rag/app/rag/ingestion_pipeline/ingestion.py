@@ -26,8 +26,8 @@ async def get_pdf_chunks_from_bytes(pdf_file: bytes, source: str) -> list[Docume
 
     # SPLITTER OBJECT
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=120,
+        chunk_size=400,
+        chunk_overlap=80,
     )
 
     chunks_docs = splitter.split_documents(documents=docs)
