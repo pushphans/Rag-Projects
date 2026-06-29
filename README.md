@@ -2,7 +2,7 @@
 
 A collection of **Retrieval-Augmented Generation (RAG)** pipelines built with **Python 3.12**, **FastAPI**, **LangChain**, and **DeepSeek Chat**.
 
-This monorepo contains two RAG implementations — one for **text** files with a local vector store, and one for **PDF** files with a cloud-based vector store.
+This monorepo contains three RAG implementations — **text** (local Chroma), **PDF** (cloud Qdrant), and a **company knowledge PDF bot** (cloud Qdrant with file upload and retrieval APIs).
 
 ## Prerequisites
 
